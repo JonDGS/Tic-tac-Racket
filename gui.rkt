@@ -1,10 +1,12 @@
 #lang racket/gui
 
 (require "logic-utilities.rkt")
+(require "draw.rkt")
+(require "winner.rkt")
 
 ;; Global Variables
-(define global-rows 10)
-(define global-columns 10)
+(define global-rows 3)
+(define global-columns 3)
 
 
 (define user-move #\X)
@@ -12,7 +14,7 @@
 (define new-game #t)
 (define current-move user-move)
 
-(define game-grid (get-matrix global-rows global-columns "_"))
+(define game-grid (get-matrix global-rows global-columns '_))
 
 ;; Window to play the game
 (define game-frame (new frame%
@@ -23,31 +25,38 @@
 ;; Canvas-box class
 (define canvas-box%
   (class canvas%
-    (init-field [character #\Space]
+    (init-field [character #\space]
                 [row 0]
                 [column 0]
                 [position 0]
-                [color (make-object color% "black")])
-   
+                [color (make-object color% "gray")])
     (inherit get-dc)
 
+    ;; Event listener
     (define/override (on-event e)
       ; mouse left button clicked
-      (when (equal? (send e get-event-type) 'left-down)
-
-
-        (set! game-grid (matrix-set-at game-grid row column "x"))
-        (displayln game-grid)
-        
+      (when (and (equal? (send e get-event-type) 'left-down) (equal? character #\space))
+       
+        ; process player move
+        (set! game-grid (matrix-set-at game-grid row column 'x))
         (send this set-character #\X)
         (send this refresh)
- 
-        (let ((dc (get-dc)))
-          (send dc clear))
+        
+        (displayln game-grid)
+
+        (when (draw? game-grid)
+            (message-box "Draw" "It's a draw!")
+            (reset-game))
+
+        (when (winner? game-grid)
+            (message-box "Win" "You won!")
+            (reset-game))
+       
+        (send (get-dc) clear)
         (send this refresh)))
-   
+
+    ;; Draw 
     (define/override  (on-paint)
-      ; handles Drawing of char X or O according to color
       (let ((dc (get-dc)))        
         (let-values (((x y) (send this get-size)))
           (send dc set-text-foreground color)
@@ -64,11 +73,7 @@
 
 ;; Panes
 ;; Main Pane
-(define main-pane (new vertical-pane%
-                      [parent game-frame]
-                      [vert-margin 5]
-                      [horiz-margin 5]
-                      [spacing 5]))
+(define main-pane (new vertical-pane% [parent game-frame] [vert-margin 5] [horiz-margin 5] [spacing 5]))
 
 ;; Creates and links the game grid panes to hold the canvases
 (define (get-panes row)
@@ -81,7 +86,7 @@
 (define (get-panes-canvases panes row)
   (cond
     ((null? panes) '())
-    (else (cons (get-pane-canvases (car panes) row 0) (get-panes-canvases (cdr panes) (+ row 1))))))
+    (else (append (get-pane-canvases (car panes) row 0) (get-panes-canvases (cdr panes) (+ row 1))))))
 
 ;; Creates and links the canvases to a single pane
 (define (get-pane-canvases pane row column)
@@ -94,8 +99,28 @@
                 (get-pane-canvases pane row (+ column 1))))))
 
 
+; Declare default panes and its canvases
 (define panes (get-panes 0))
 (define canvases (get-panes-canvases panes 0))
+
+;; Resets all game setup for a new game
+(define (reset-game)
+  ; reset canvas characters
+  (for [(canvas  canvases)]
+      (send canvas set-character #\Space)
+      (send canvas set-color (make-object color% "gray"))
+      (send canvas refresh))
+  ; reset game grid
+  (set! game-grid (get-matrix global-rows global-columns '_))
+  (send game-frame refresh))
+
+;; Sets an ia move
+(define (set-ia-move row column)
+  (set! game-grid (matrix-set-at game-grid row column 'o))
+  (send (list-ref canvases (+ column (* row global-columns))) set-character #\o)
+  (send (list-ref canvases (+ column (* row global-columns))) refresh))
+
+;;----------------------- Input Frame -------------------------
 
 ;; Window to input the game grid's rows and columns
 (define input-frame (new frame%
@@ -128,18 +153,31 @@
                    [min-width 75]
                    [min-height 50]
                    [vert-margin 15]
-                   [callback (λ (b e) 
+                   [callback (λ (b e)
+                     ; Overriding the default game-frame contents
                      (set! global-rows (string->number (send rows-input get-string-selection)))
                      (set! global-columns (string->number (send columns-input get-string-selection)))
-                     ; set game-grid
-                     ; set panes
-                     ; set canvases
-                     
+                     (set! game-frame (new frame% [label "Tic Tac Racket"] [width 600] [height 600]))
+                     (send game-frame center 'both)
+                     (set! game-grid (get-matrix global-rows global-columns '_))
+                     (set! main-pane (new vertical-pane% [parent game-frame] [vert-margin 5] [horiz-margin 5] [spacing 5]))
+                     (set! panes (get-panes 0))
+                     (set! canvases (get-panes-canvases panes 0))
+
+                     ; Switching from input-frame to game-frame
                      (send game-frame show #t)
                      (send input-frame show #f) )]))
 
+; Center both frames as default
 (send game-frame center 'both)
 (send input-frame center 'both)
 
 ;(send input-frame show #t)
 (send game-frame show #t)
+
+; test IA moves
+(set-ia-move 1 1)
+(set-ia-move 0 0)
+(set-ia-move 0 2)
+(set-ia-move 2 0)
+(set-ia-move 2 2)
