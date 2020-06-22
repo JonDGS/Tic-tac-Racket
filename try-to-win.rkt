@@ -3,6 +3,42 @@
 (require "logic-utilities.rkt")
 
 
+;;Adds element to the back of the list instead of the beginning
+(define (cons-at-tail element currentList)
+  (cond
+    ((null? currentList) (list element))
+    (else (cons (car currentList) (cons-at-tail element (cdr currentList)))))) 
+
+;;Finds if an element is a member of a list
+(define (miembro element elementList)
+  (cond ((null? elementList) #f)
+        ((equal? element (car elementList)) #t)
+        (else (miembro element (cdr elementList)))))
+
+;;Gets all the symbol of a row with their n and m coordinates
+(define (get-symbol-from-row rowList currentRow currentColumn symbol currentPairs prevOriginList)
+  (cond
+    ((null? rowList) currentPairs)
+    ((equal? (car rowList) '_) (get-symbol-from-row (cdr rowList) currentRow (+ currentColumn 1) symbol currentPairs prevOriginList))
+    ((miembro (list currentRow currentColumn) prevOriginList) (get-symbol-from-row (cdr rowList) currentRow (+ currentColumn 1) symbol currentPairs prevOriginList))
+    ((equal? (car rowList) symbol) (get-symbol-from-row (cdr rowList) currentRow (+ currentColumn 1) symbol (cons-at-tail (list currentRow currentColumn) currentPairs) prevOriginList))
+    (else (get-symbol-from-row (cdr rowList) currentRow (+ currentColumn 1) symbol currentPairs prevOriginList))))
+
+;;Loop for finding all possible pairs for a point given said point as input
+(define (get-pairs-aux grid currentRow symbol currentPairs prevOriginList)
+  (cond
+    ((null? grid) (list currentPairs prevOriginList))
+    (else (get-pairs-aux (cdr grid) (+ currentRow 1) symbol (get-symbol-from-row (car grid) (+ currentRow 1) 0 symbol currentPairs prevOriginList) prevOriginList))))
+
+(define (get-pairs-without-origin grid symbol)
+  (get-pairs-aux grid -1 symbol '() '()))
+
+
+;;Finds all possible pairs of a point in a grid
+(define (get-pairs grid origin symbol prevOriginList)
+  (get-pairs-aux grid -1 symbol '() (cons origin prevOriginList)))
+
+
 ;;Loop for get-value-in-list-by-index function which searches within a list with a given index
 (define (get-value-in-list-by-index-aux lista index current)
   (cond
@@ -55,11 +91,79 @@
 (define (get-move grid numRows numColumns symbol start finish)
   (cond
     ((= (car start) (car finish)) (place-next-n grid numColumns (car start) symbol))
-    ((= (cadr start) (cadr finish)) (place-next-m grid numRows (cadr start) symbol))))
+    ((= (cadr start) (cadr finish)) (place-next-m grid numRows (cadr start) symbol))
+    (else -1)))
 
-(define (get-updated-grid grid )
+;;Helper function for storing values in recursive calls for get-solution-for-symbol
+(define (get-solution-for-symbol-aux-helper grid numRows numColumns symbol origin possiblePairsList lastResult)
+  (cond
+    ((and (null? possiblePairsList) (equal? -1 lastResult)) -1)
+    ((not (equal? -1 lastResult)) lastResult)
+    (else (get-solution-for-symbol-aux-helper grid numRows numColumns symbol origin (cdr possiblePairsList) (get-move grid numRows numColumns symbol origin (car possiblePairsList))))))
+    
+  
+
+;;Helper function for storing values in recursive calls for get-solution-for-symbol
+(define (get-solution-for-symbol-mid-helper grid  numRows numColumns symbol originList  pairsInfo)
+  (get-solution-for-symbol-aux grid numRows numColumns symbol (cdr originList) (cons (car originList) (cadr pairsInfo))
+                                (get-solution-for-symbol-aux-helper grid numRows numColumns symbol (car originList) (car (get-pairs grid (car originList) symbol (cons (car originList) (cadr pairsInfo)))) -1)))
+
+
+;;Loop for finding solution to the grid given an specific symbol
+(define (get-solution-for-symbol-aux grid numRows numColumns symbol originList prevOriginList lastResult)
+  (cond
+    ((null? originList) -1)
+    ((not (equal? -1 lastResult)) lastResult)
+    (else (get-solution-for-symbol-mid-helper grid numRows numColumns symbol originList (get-pairs grid (car originList) symbol prevOriginList)))))
+  
+
+
+;;Finds the solution to a grid given itself, the number of rows and columns and the symbol
+(define (get-solution-for-symbol grid numRows numColumns symbol)
+  (get-solution-for-symbol-aux grid numRows numColumns symbol (car (get-pairs-without-origin grid symbol)) '() -1))
+
+;;Loops that finds an open position within the grid
+(define (computer-random-attack-aux grid numRows numColumns result)
+  (cond
+    ((equal? (get-value-base-on-index grid (car result) (cadr result)) '_) (matrix-set-at grid (car result) (cadr result) 'o))
+    (else (computer-random-attack grid numRows numColumns))))
+
+;;Randomizes a response by the computer
+(define (computer-random-attack grid numRows numColumns)
+  (computer-random-attack-aux grid numRows numColumns (list (random numRows) (random numColumns))))
+  
+
+;;Determines whether or not an attack is possible
+(define (computer-attack-aux grid numRows numColumns result)
+  (cond
+    ((equal? -1 result) (computer-random-attack grid numRows numColumns))
+    (else (matrix-set-at grid (car result) (cadr result) 'o))))
+
+;;Gets a attack move by the computer
+(define (computer-attack grid numRows numColumns)
+  (computer-attack-aux grid numRows numColumns (get-solution-for-symbol grid numRows numColumns 'o)))
+
+;;Loop that determines whether or not computer is losing
+(define (computer-counter-aux grid numRows numColumns result)
+  (cond
+    ((equal? -1 result) (computer-attack grid numRows numColumns))
+    (else (matrix-set-at grid (car result) (cadr result) 'o))))
+
+;;Gets a counter move by the computer to avoid losing
+(define (computer-counter grid numRows numColumns)
+  (computer-counter-aux grid numRows numColumns (get-solution-for-symbol grid numRows numColumns 'x)))
+  
+  
+
+;;Gets the next possible state of the grid
+(define (get-updated-grid grid numRows numColumns)
+  (computer-counter grid numRows numColumns))
+  
 
 
 
 ;;(get-value-base-on-index (list '(1 2 3) '(4 5 6) '(7 8 9)) 1 1)
-(get-move (list (list 'x '_ '_) (list 'x '_ '_) (list 'x '_ '_)) 3 3 'x '(0 0) '(2 0))
+;;(get-move (list (list 'x '_ '_) (list 'x '_ '_) (list 'x '_ '_)) 3 3 'x '(0 0) '(2 0))
+;;(get-solution-for-symbol (list (list 'x '_ '_) (list 'o 'o '_) (list 'x '_ '_)) 3 3 'o)
+;;(get-pairs-without-origin (list (list 'x '_ '_) (list 'x '_ '_) (list '_ '_ '_)) 'x)
+(get-updated-grid (list (list 'x '_ 'x) (list '_ 'x '_) (list 'o '_ '_)) 3 3)
