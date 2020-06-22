@@ -161,9 +161,9 @@
   
 
 
-
+;;Test cases
 ;;(get-value-base-on-index (list '(1 2 3) '(4 5 6) '(7 8 9)) 1 1)
 ;;(get-move (list (list 'x '_ '_) (list 'x '_ '_) (list 'x '_ '_)) 3 3 'x '(0 0) '(2 0))
 ;;(get-solution-for-symbol (list (list 'x '_ '_) (list 'o 'o '_) (list 'x '_ '_)) 3 3 'o)
 ;;(get-pairs-without-origin (list (list 'x '_ '_) (list 'x '_ '_) (list '_ '_ '_)) 'x)
-(get-updated-grid (list (list 'x '_ 'x) (list '_ 'x '_) (list 'o '_ '_)) 3 3)
+;;(get-updated-grid (list (list 'x '_ 'x) (list '_ 'x '_) (list 'o '_ '_)) 3 3)
