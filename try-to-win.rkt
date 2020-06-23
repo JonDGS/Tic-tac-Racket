@@ -182,7 +182,7 @@
   
 
 ;;Gets the next possible state of the grid
-(define (get-updated-grid grid numRows numColumns)
+(define (get-computer-next-move grid numRows numColumns)
   (computer-counter grid numRows numColumns))
   
 
@@ -192,6 +192,6 @@
 ;;(get-move (list (list 'x '_ '_) (list 'x '_ '_) (list 'x '_ '_)) 3 3 'x '(0 0) '(2 0))
 ;;(get-solution-for-symbol (list (list 'x '_ '_) (list 'o 'o '_) (list 'x '_ '_)) 3 3 'o)
 ;;(get-pairs-without-origin (list (list 'x '_ '_) (list 'x '_ '_) (list '_ '_ '_)) 'x)
-(get-updated-grid (list (list 'x '_ '_ '_) (list 'o '_ '_ '_) (list 'x '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
+;;(get-computer-next-move (list (list 'x '_ '_ '_) (list 'o '_ '_ '_) (list 'x '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
 
 (provide (all-defined-out))
