@@ -2,12 +2,12 @@
 (provide (all-defined-out))
 
 #|
-; Draw function, checks a if a given grid has space left to keep playing.
-; If its full there would be a draw and the function returns true, if there is
-; space left on the gird the function returns false. This function should always
-; be used after the winner? function, this because our defined state for a draw is
-; simply a lack of spaces to keep playing and there could be a winner in a grid
-; with no spaces left
+ Draw function, checks a if a given grid has space left to keep playing.
+ If its full there would be a draw and the function returns true, if there is
+ space left on the gird the function returns false. This function should always
+ be used after the winner? function, this because our defined state for a draw is
+ simply a lack of spaces to keep playing and there could be a winner in a grid
+ with no spaces left
 |#
 
 (define (draw? grid)
@@ -24,7 +24,7 @@
           #f)
          ((equal? '_ (car list))
           #t)
-         (else+3
+         (else
           (draw?-aux (cdr list)))))
           
 
