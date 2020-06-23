@@ -151,7 +151,7 @@
 ;;Loops that finds an open position within the grid
 (define (computer-random-attack-aux grid numRows numColumns result)
   (cond
-    ((equal? (get-value-base-on-index grid (car result) (cadr result)) '_) (matrix-set-at grid (car result) (cadr result) 'o))
+    ((equal? (get-value-base-on-index grid (car result) (cadr result)) '_) result)
     (else (computer-random-attack grid numRows numColumns))))
 
 ;;Randomizes a response by the computer
@@ -163,7 +163,7 @@
 (define (computer-attack-aux grid numRows numColumns result)
   (cond
     ((equal? -1 result) (computer-random-attack grid numRows numColumns))
-    (else (matrix-set-at grid (car result) (cadr result) 'o))))
+    (else result)))
 
 ;;Gets a attack move by the computer
 (define (computer-attack grid numRows numColumns)
@@ -173,7 +173,7 @@
 (define (computer-counter-aux grid numRows numColumns result)
   (cond
     ((equal? -1 result) (computer-attack grid numRows numColumns))
-    (else (matrix-set-at grid (car result) (cadr result) 'o))))
+    (else result)))
 
 ;;Gets a counter move by the computer to avoid losing
 (define (computer-counter grid numRows numColumns)
