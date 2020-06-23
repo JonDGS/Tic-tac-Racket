@@ -3,6 +3,16 @@
 (require "logic-utilities.rkt")
 
 
+;;Loop for finding a list length
+(define (get-list-len-aux currentList currentLength)
+  (cond
+    ((null? currentList) currentLength)
+    (else (get-list-len-aux (cdr currentList) (+ currentLength 1)))))
+
+;;Gets the length of a list
+(define (get-list-len currentList)
+  (get-list-len-aux currentList 0))
+
 ;;Adds element to the back of the list instead of the beginning
 (define (cons-at-tail element currentList)
   (cond
@@ -62,36 +72,52 @@
 ;;Gets the value on an index in a given matrix
 (define (get-value-base-on-index matrix row column)
   (get-value-base-on-index-aux matrix row column 0 -1))
-  
+
+
+;;Verifies that the line hasn't been cut off earlier
+(define (verify-single-solution resultList)
+  (cond
+    ((= 1 (get-list-len resultList)) (car resultList))
+    (else -1)))
+
 
 ;;Loop for detecting the possibilty of horizontal lines within the grid
-(define (place-next-n-aux grid numColumns n symbol currentM)
+(define (place-next-n-aux grid numColumns n symbol otherSymbol currentM resultList)
   (cond
-    ((>= currentM numColumns) -1)
-    ((equal? (get-value-base-on-index grid n currentM)  '_) (list n currentM))
-    (else (place-next-n-aux grid numColumns n symbol (+ currentM 1)))))
+    ((>= currentM numColumns) (verify-single-solution resultList))
+    ((equal? (get-value-base-on-index grid n currentM)  '_) (place-next-n-aux grid numColumns n symbol otherSymbol (+ currentM 1) (cons (list n currentM) resultList)))
+    ((equal? (get-value-base-on-index grid n currentM) otherSymbol) -1)
+    (else (place-next-n-aux grid numColumns n symbol otherSymbol (+ currentM 1) resultList))))
 
 ;;Gets the n and m coordinates for placing a symbol to complete a horizontal line
-(define (place-next-n grid numColumns n symbol)
-  (place-next-n-aux grid numColumns n symbol 0))
+(define (place-next-n grid numColumns n symbol otherSymbol)
+  (place-next-n-aux grid numColumns n symbol otherSymbol 0 '()))
 
 ;;Loop for detecting the possibility of vertical lines within the grid
-(define (place-next-m-aux grid numRows m symbol currentN)
+(define (place-next-m-aux grid numRows m symbol otherSymbol currentN resultList)
   (cond
-    ((>= currentN numRows) -1)
-    ((equal? (get-value-base-on-index grid currentN m) '_) (list currentN m))
-    (else (place-next-m-aux grid numRows m symbol (+ currentN 1)))))
+    ((>= currentN numRows) (verify-single-solution resultList))
+    ((equal? (get-value-base-on-index grid currentN m) '_) (place-next-m-aux grid numRows m symbol otherSymbol (+ currentN 1) (cons (list currentN m) resultList)))
+    ((equal? (get-value-base-on-index grid currentN m) otherSymbol) -1)
+    (else (place-next-m-aux grid numRows m symbol otherSymbol (+ currentN 1) resultList))))
 
 ;;Gets the n and m coordinates for placing a symbol to complete a vertical line
-(define (place-next-m grid numRows m symbol)
-  (place-next-m-aux grid numRows m symbol 0))
+(define (place-next-m grid numRows m symbol otherSymbol)
+  (place-next-m-aux grid numRows m symbol otherSymbol 0 '()))
   
+
+;;Gets the opposite symbol
+(define (get-other-symbol symbol)
+  (cond
+    ((equal? symbol 'x) 'o)
+    ((equal? symbol 'o) 'x)))
+
 
 ;;Gets the n and m coordinates for a given move by the computer
 (define (get-move grid numRows numColumns symbol start finish)
   (cond
-    ((= (car start) (car finish)) (place-next-n grid numColumns (car start) symbol))
-    ((= (cadr start) (cadr finish)) (place-next-m grid numRows (cadr start) symbol))
+    ((= (car start) (car finish)) (place-next-n grid numColumns (car start) symbol (get-other-symbol symbol)))
+    ((= (cadr start) (cadr finish)) (place-next-m grid numRows (cadr start) symbol (get-other-symbol symbol)))
     (else -1)))
 
 ;;Helper function for storing values in recursive calls for get-solution-for-symbol
@@ -166,4 +192,4 @@
 ;;(get-move (list (list 'x '_ '_) (list 'x '_ '_) (list 'x '_ '_)) 3 3 'x '(0 0) '(2 0))
 ;;(get-solution-for-symbol (list (list 'x '_ '_) (list 'o 'o '_) (list 'x '_ '_)) 3 3 'o)
 ;;(get-pairs-without-origin (list (list 'x '_ '_) (list 'x '_ '_) (list '_ '_ '_)) 'x)
-;;(get-updated-grid (list (list 'x '_ 'x) (list '_ 'x '_) (list 'o '_ '_)) 3 3)
+;;(get-updated-grid (list (list 'x '_ '_ '_) (list 'o '_ '_ '_) (list 'x '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
