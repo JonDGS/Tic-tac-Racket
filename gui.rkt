@@ -9,12 +9,8 @@
 ;; Global Variables
 (define global-rows 3)
 (define global-columns 3)
-
-
-(define user-move #\X)
-(define computer-move #\O)
-(define new-game #t)
-(define current-move user-move)
+(define blue (make-object color% 102 140 255 1))
+(define red (make-object color% 255 102 102 1))
 
 (define game-grid (get-matrix global-rows global-columns '_))
 
@@ -31,7 +27,7 @@
                 [row 0]
                 [column 0]
                 [position 0]
-                [color (make-object color% "gray")])
+                [color blue])
     (inherit get-dc)
 
     ;; Event listener
@@ -41,7 +37,7 @@
         
         ; process player move
         (set! game-grid (matrix-set-at game-grid row column 'x))
-        (send this set-character #\X)
+        (send this set-character #\x)
         (send this refresh)
         (displayln " ")
         (displayln game-grid)
@@ -75,7 +71,7 @@
     (define/override  (on-paint)
       (let ((dc (get-dc)))        
         (let-values (((x y) (send this get-size)))
-          (send dc set-text-foreground color)
+          (send dc set-text-foreground (get-canvas-color character))
           (send dc set-font (make-object font% (+ 60 (* -2 (+ global-rows global-columns))) 'default))
           (send dc draw-text (string character) (/ (- x (+ 60 (* -2 (+ global-rows global-columns)))) 2) (/ (- y (+ 93 (* -3 (+ global-rows global-columns)))) 2)))))
    
@@ -86,6 +82,11 @@
       (set! character char))
    
     (super-new)))
+
+;; Returns the color associated with the playable character
+(define (get-canvas-color character)
+  (cond ((equal? character #\x) blue)
+        (else red)))
 
 ;; Panes
 ;; Main Pane
@@ -132,6 +133,7 @@
 
 ;; Sets an ia move
 (define (set-computer-move row column)
+  (displayln (list row column))
   (set! game-grid (matrix-set-at game-grid row column 'o))
   (send (list-ref canvases (+ column (* row global-columns))) set-character #\o)
   (send (list-ref canvases (+ column (* row global-columns))) refresh))
