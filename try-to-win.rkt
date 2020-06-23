@@ -162,7 +162,7 @@
 ;;Determines whether or not an attack is possible
 (define (computer-attack-aux grid numRows numColumns result)
   (cond
-    ((equal? -1 result) (computer-random-attack grid numRows numColumns))
+    ((equal? -1 result) (computer-counter grid numRows numColumns))
     (else result)))
 
 ;;Gets a attack move by the computer
@@ -172,7 +172,7 @@
 ;;Loop that determines whether or not computer is losing
 (define (computer-counter-aux grid numRows numColumns result)
   (cond
-    ((equal? -1 result) (computer-attack grid numRows numColumns))
+    ((equal? -1 result) (computer-random-attack grid numRows numColumns))
     (else result)))
 
 ;;Gets a counter move by the computer to avoid losing
@@ -183,7 +183,7 @@
 
 ;;Gets the next possible state of the grid
 (define (get-computer-next-move grid numRows numColumns)
-  (computer-counter grid numRows numColumns))
+  (computer-attack grid numRows numColumns))
   
 
 
@@ -192,6 +192,6 @@
 ;;(get-move (list (list 'x '_ '_) (list 'x '_ '_) (list 'x '_ '_)) 3 3 'x '(0 0) '(2 0))
 ;;(get-solution-for-symbol (list (list 'x '_ '_) (list 'o 'o '_) (list 'x '_ '_)) 3 3 'o)
 ;;(get-pairs-without-origin (list (list 'x '_ '_) (list 'x '_ '_) (list '_ '_ '_)) 'x)
-;;(get-computer-next-move (list (list 'x '_ '_ '_) (list 'o '_ '_ '_) (list 'x '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
+(get-computer-next-move (list (list 'x '_ '_ '_) (list 'o '_ '_ '_) (list 'x '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
 
 (provide (all-defined-out))
