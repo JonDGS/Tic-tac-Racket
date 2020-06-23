@@ -52,8 +52,8 @@
             (reset-game))
 
         (when (and (not (draw? game-grid)) (not (winner? game-grid)) (not (empty? game-grid)))
-          (set-computer-move (car (get-computer-next-move game-grid global-rows global-columns))
-                             (cadr (get-computer-next-move game-grid global-rows global-columns))))
+          (set-computer-move (get-computer-next-move game-grid global-rows global-columns)))
+            
         (displayln game-grid)
         
         (when (winner? game-grid)
@@ -131,12 +131,12 @@
   (set! game-grid (get-matrix global-rows global-columns '_))
   (send game-frame refresh))
 
-;; Sets an ia move
-(define (set-computer-move row column)
-  (displayln (list row column))
-  (set! game-grid (matrix-set-at game-grid row column 'o))
-  (send (list-ref canvases (+ column (* row global-columns))) set-character #\o)
-  (send (list-ref canvases (+ column (* row global-columns))) refresh))
+;; Sets a computer move
+(define (set-computer-move row-and-column)
+  (displayln row-and-column)
+  (set! game-grid (matrix-set-at game-grid (car row-and-column) (cadr row-and-column) 'o))
+  (send (list-ref canvases (+ (cadr row-and-column) (* (car row-and-column) global-columns))) set-character #\o)
+  (send (list-ref canvases (+ (cadr row-and-column) (* (car row-and-column) global-columns))) refresh))
 
 ;;----------------------- Input Frame -------------------------
 
