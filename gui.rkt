@@ -3,6 +3,8 @@
 (require "logic-utilities.rkt")
 (require "draw.rkt")
 (require "winner.rkt")
+(require "try-to-win.rkt")
+(require "empty.rkt")
 
 ;; Global Variables
 (define global-rows 3)
@@ -36,13 +38,14 @@
     (define/override (on-event e)
       ; mouse left button clicked
       (when (and (equal? (send e get-event-type) 'left-down) (equal? character #\space))
-       
+        
         ; process player move
         (set! game-grid (matrix-set-at game-grid row column 'x))
         (send this set-character #\X)
         (send this refresh)
-        
+        (displayln " ")
         (displayln game-grid)
+        (sleep/yield 0.1)
 
         (when (draw? game-grid)
             (message-box "Draw" "It's a draw!")
@@ -51,7 +54,20 @@
         (when (winner? game-grid)
             (message-box "Win" "You won!")
             (reset-game))
-       
+
+        (when (and (not (draw? game-grid)) (not (winner? game-grid)) (not (empty? game-grid)))
+          (set-computer-move (car (get-computer-next-move game-grid global-rows global-columns))
+                             (cadr (get-computer-next-move game-grid global-rows global-columns))))
+        (displayln game-grid)
+        
+        (when (winner? game-grid)
+            (message-box "Win" "The computer won!")
+            (reset-game))
+        
+        (when (draw? game-grid)
+            (message-box "Draw" "It's a draw!")
+            (reset-game))
+        
         (send (get-dc) clear)
         (send this refresh)))
 
@@ -115,7 +131,7 @@
   (send game-frame refresh))
 
 ;; Sets an ia move
-(define (set-ia-move row column)
+(define (set-computer-move row column)
   (set! game-grid (matrix-set-at game-grid row column 'o))
   (send (list-ref canvases (+ column (* row global-columns))) set-character #\o)
   (send (list-ref canvases (+ column (* row global-columns))) refresh))
@@ -174,10 +190,3 @@
 
 ;(send input-frame show #t)
 (send game-frame show #t)
-
-; test IA moves
-(set-ia-move 1 1)
-(set-ia-move 0 0)
-(set-ia-move 0 2)
-(set-ia-move 2 0)
-(set-ia-move 2 2)
