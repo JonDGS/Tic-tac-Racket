@@ -1,2 +1,2 @@
 # Tic-tac-Racket
-Tic-tac-toe game developed in Racket
+Tic-tac-toe game developed on Racket
