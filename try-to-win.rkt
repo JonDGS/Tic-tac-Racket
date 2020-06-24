@@ -80,6 +80,53 @@
     ((= 1 (get-list-len resultList)) (car resultList))
     (else -1)))
 
+;;Loop for placing in the next diagonal possible
+(define (place-next-diagonal-aux grid numColumns currentRow currentColumn symbol otherSymbol resultList)
+  (cond
+    ((>= currentColumn numColumns) (verify-single-solution resultList))
+    ((equal? (get-value-base-on-index grid currentRow currentColumn)  '_)
+     (place-next-diagonal-aux grid numColumns (+ currentRow 1) (+ currentColumn 1) symbol otherSymbol (cons (list currentRow currentColumn) resultList)))
+    ((equal? (get-value-base-on-index grid currentRow currentColumn)  otherSymbol) -1)
+    (else (place-next-diagonal-aux grid numColumns (+ currentRow 1) (+ currentColumn 1) symbol otherSymbol resultList))))
+
+;;Places in the next diagonal possible
+(define (place-next-diagonal grid numColunms startingPoint symbol otherSymbol)
+  (place-next-diagonal-aux grid numColunms (car startingPoint) 0 symbol otherSymbol '()))
+
+;;Loop for placing in the next antidiagonal possible
+(define (place-next-antidiagonal-aux grid numColumns currentRow currentColumn symbol otherSymbol resultList)
+  (cond
+    ((<= currentColumn 0) (verify-single-solution resultList))
+    ((equal? (get-value-base-on-index grid currentRow currentColumn)  '_)
+     (place-next-antidiagonal-aux grid numColumns (+ currentRow 1) (- currentColumn 1) symbol otherSymbol (cons (list currentRow currentColumn) resultList)))
+    ((equal? (get-value-base-on-index grid currentRow currentColumn)  otherSymbol) -1)
+    (else (place-next-antidiagonal-aux grid numColumns (+ currentRow 1) (- currentColumn 1) symbol otherSymbol resultList))))
+
+;;Places in the next antidiagonal possible
+(define (place-next-antidiagonal grid numColumns startingPoint symbol otherSymbol)
+  (place-next-antidiagonal-aux grid numColumns (car startingPoint) 0 symbol otherSymbol '()))
+
+;;Gets the starting point for a diagonal
+(define (get-diagonal-starting-point start)
+  (cond
+    ((zero? (cadr start)) start)
+    ((zero? (car start)) start)
+    (else (get-diagonal-starting-point (list (- (car start) 1) (- (cadr start) 1))))))
+
+;;Gets the starting point for an antidiagonal
+(define (get-antidiagonal-starting-point numColumns start)
+  (cond
+    ((= (cadr start) (- numColumns 1)) start)
+    ((zero? (car start)) start)
+    (else (get-antidiagonal-starting-point numColumns (list (- (car start) 1) (+ (cadr start) 1))))))
+
+;;Analyzes the grid for diagonals and antidiagonals
+(define (analize-diagonal grid numColumns symbol start finish)
+  (cond
+    ((= (- (car start) (car finish)) (- (cadr start) (cadr finish))) (place-next-diagonal grid numColumns (get-diagonal-starting-point start) symbol (get-other-symbol symbol)))
+    ((= (- (car start) (car finish)) (- (cadr finish) (cadr start))) (place-next-antidiagonal grid numColumns (get-antidiagonal-starting-point numColumns start) symbol (get-other-symbol symbol)))
+    (else -1)))
+
 
 ;;Loop for detecting the possibilty of horizontal lines within the grid
 (define (place-next-n-aux grid numColumns n symbol otherSymbol currentM resultList)
@@ -118,7 +165,7 @@
   (cond
     ((= (car start) (car finish)) (place-next-n grid numColumns (car start) symbol (get-other-symbol symbol)))
     ((= (cadr start) (cadr finish)) (place-next-m grid numRows (cadr start) symbol (get-other-symbol symbol)))
-    (else -1)))
+    (else (analize-diagonal grid numColumns symbol start finish))))
 
 ;;Helper function for storing values in recursive calls for get-solution-for-symbol
 (define (get-solution-for-symbol-aux-helper grid numRows numColumns symbol origin possiblePairsList lastResult)
@@ -192,6 +239,11 @@
 ;;(get-move (list (list 'x '_ '_) (list 'x '_ '_) (list 'x '_ '_)) 3 3 'x '(0 0) '(2 0))
 ;;(get-solution-for-symbol (list (list 'x '_ '_) (list 'o 'o '_) (list 'x '_ '_)) 3 3 'o)
 ;;(get-pairs-without-origin (list (list 'x '_ '_) (list 'x '_ '_) (list '_ '_ '_)) 'x)
-(get-computer-next-move (list (list 'x '_ '_ '_) (list 'o '_ '_ '_) (list 'x '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
+;;Testing for diagonals
+;;(get-computer-next-move (list (list 'x '_ '_ '_) (list '_ 'x '_ '_) (list '_ '_ 'x '_) (list '_ '_ '_ '_)) 4 4)
+;;(get-computer-next-move (list (list '_ '_ '_ 'x) (list '_ '_ 'x '_) (list '_ 'x '_ '_) (list '_ '_ '_ '_)) 4 4)
+;;((_ o x) (x x o) (_ _ _))
+;;(get-computer-next-move (list (list '_ 'o 'x) (list 'x 'x 'o) (list '_ '_ '_)) 3 3)
+;;(get-computer-next-move (list (list '_ 'o 'x '_) (list 'x 'x 'o '_) (list '_ '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
 
 (provide (all-defined-out))
