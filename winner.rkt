@@ -7,34 +7,34 @@
 |#
 
 (define (winner? grid)
-   (cond ((winner?-h grid) 
-          #t)
-         ((winner?-v grid)
+   (cond ((or (winner?-h grid)(winner?-v grid)) 
           #t)
          ;((winner?-d grid)
          ; #t)
          (else
           #f)))
 
-; HORIZONTAL check
+; HORIZONTAL check - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 (define (winner?-h grid)
    (cond ((null? grid)
           #f)
-         ((or (winner?-h-aux1 (car grid) 'x) (winner?-h-aux1 (car grid) 'o))
+         ((or (same-element? (car grid) 'x) (same-element? (car grid) 'o))
           #t)
          (else
           (winner?-h (cdr grid)))))
 
 ; Returns true if all the columns of a row are the same as the given element, flase otherwise
-(define (winner?-h-aux1 list element)
+(define (same-element? list element)
    (cond ((null? list)
           #t)
          ((equal? element (car list))
-          (winner?-h-aux1 (cdr list) element))
+          (same-element? (cdr list) element))
          (else
           #f)))
 
-; VERTICAL check
+; VERTICAL check - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 (define (winner?-v grid)
    (cond ((or (null? grid) (null? (car grid)))
           #f)
@@ -59,12 +59,58 @@
          (else
           nGrid)))
 
-  
+; DIAGONAL check - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+(define (winner?-d grid)
+   (cond ((or (winner?-d-aux1 grid)(winner?-d-aux1 (change-grid grid '())))
+          #t)
+         (else
+          #f)))
+
+(define (winner?-d-aux1 grid)
+   (cond ((analizeDiagonals (getDiagonals grid))
+          #t)
+         (else
+          #f)))          
+
+; Checks if a giveng list of lists has a list with both a length greater or equal to three and all its elements the same
+(define (analizeDiagonals lists)
+   (cond ((null? lists)
+          #f)
+         ((and (<= 3 (length (car lists)))(or (same-element? (car lists) 'x)(same-element? (car lists) 'o)))
+          #t)
+         (else
+          (analizeDiagonals (cdr lists)))))
+
+; Takes the diagonals of a grid and puts them in a list
+(define (getDiagonals grid)
+   (#f))
+
+; Deberia tomar la grid e invertir su eje x para poder analizar las antidiagonales
+(define (change-grid grid nGrid)
+   (cond ((null? grid)
+          nGrid)
+         (else
+          (change-grid (cdr grid)(append nGrid (list (reverse-list (car grid) '())))))))
+
+; Deberia tomar una lista y devolverla pero con sus elementos en orden inverso
+(define (reverse-list oList rList)
+   (cond ((null? oList)
+          rList)
+         (else
+          (reverse-list (cdr oList)(cons (car oList) rList)))))
+
+;(reverse-list '(1 2 3 4 5 6) '())
+
+;(change-grid '((_ _ o)(_ o _)(o _ _)) '())
 
 
+;(analizeDiagonals '((o o _)(x o x)(o o)))
+;(analizeDiagonals '((o o o)(x x x)(o o)))
+
+(analizeDiagonals '((o o o o)(x x x x)(o o o o)))
 
 ; TESTS
-
 #|
 (winner? '((x o o)
            (o x o)
