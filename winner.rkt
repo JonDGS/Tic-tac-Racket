@@ -86,27 +86,24 @@
 (define (getDiagonals grid)
    (#f))
 
-; Deberia tomar la grid e invertir su eje x para poder analizar las antidiagonales
+; This function takes a grid and inverts its x axis, this is used to inspect the antidiagonals
 (define (change-grid grid nGrid)
    (cond ((null? grid)
           nGrid)
          (else
           (change-grid (cdr grid)(append nGrid (list (reverse-list (car grid) '())))))))
 
-; Deberia tomar una lista y devolverla pero con sus elementos en orden inverso
+; Takes a list and inverts the order of its elements
 (define (reverse-list oList rList)
    (cond ((null? oList)
           rList)
          (else
           (reverse-list (cdr oList)(cons (car oList) rList)))))
 
-;(reverse-list '(1 2 3 4 5 6) '())
-
-;(change-grid '((_ _ o)(_ o _)(o _ _)) '())
 
 
-;(analizeDiagonals '((o o _)(x o x)(o o)))
-;(analizeDiagonals '((o o o)(x x x)(o o)))
+
+
 
 (analizeDiagonals '((o o o o)(x x x x)(o o o o)))
 
