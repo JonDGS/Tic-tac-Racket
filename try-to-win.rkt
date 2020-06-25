@@ -64,8 +64,8 @@
 ;;Loop for getting value within a matrix based on an index
 (define (get-value-base-on-index-aux matrix targetRow targetColumn currentRow currentAnswer)
   (cond
+    ((null? matrix) -1)
     ((not (equal? currentAnswer -1)) currentAnswer)
-    ((null? (car matrix)) -1)
     ((= targetRow currentRow) (get-value-in-list-by-index (car matrix) targetColumn))
     (else (get-value-base-on-index-aux (cdr matrix) targetRow targetColumn (+ currentRow 1) -1))))
 
@@ -245,5 +245,7 @@
 ;;((_ o x) (x x o) (_ _ _))
 ;;(get-computer-next-move (list (list '_ 'o 'x) (list 'x 'x 'o) (list '_ '_ '_)) 3 3)
 ;;(get-computer-next-move (list (list '_ 'o 'x '_) (list 'x 'x 'o '_) (list '_ '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
+;;((x o x o o) (o x o _ x) (x o x x x) (_ _ x o x) (o o x _ o))
+;;(get-computer-next-move (list (list 'x 'o 'x 'o 'o) (list 'o 'x 'o '_ 'x) (list 'x 'o 'x 'x 'x) (list '_ '_ 'x 'o 'x) (list 'o 'o 'x '_ 'o)) 5 5)
 
 (provide (all-defined-out))
