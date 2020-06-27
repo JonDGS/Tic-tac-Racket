@@ -7,10 +7,8 @@
 |#
 
 (define (winner? grid)
-   (cond ((or (winner?-h grid)(winner?-v grid)) 
+   (cond ((or (winner?-h grid)(winner?-v grid)(winner?-d grid)) 
           #t)
-         ;((winner?-d grid)
-         ; #t)
          (else
           #f)))
 
@@ -68,12 +66,12 @@
           #f)))
 
 (define (winner?-d-aux1 grid)
-   (cond ((analizeDiagonals (getDiagonals grid))
+   (cond ((analizeDiagonals (getDiagonals grid '() '()))
           #t)
          (else
           #f)))          
 
-; Checks if a giveng list of lists has a list with both a length greater or equal to three and all its elements the same
+; Checks if a giveng list of lists contains a sub list with both a length greater, or equal, than three and all its elements the same
 (define (analizeDiagonals lists)
    (cond ((null? lists)
           #f)
@@ -81,10 +79,6 @@
           #t)
          (else
           (analizeDiagonals (cdr lists)))))
-
-; Takes the diagonals of a grid and puts them in a list
-(define (getDiagonals grid)
-   (#f))
 
 ; This function takes a grid and inverts its x axis, this is used to inspect the antidiagonals
 (define (change-grid grid nGrid)
@@ -100,18 +94,48 @@
          (else
           (reverse-list (cdr oList)(cons (car oList) rList)))))
 
+; Takes a grid and gives us a list of diagonal lists of the grid
+(define (getDiagonals grid nGrid diagonals)
+   (cond ((and (null? grid)(null? nGrid))
+          diagonals)
+         ((null? nGrid)
+          (getDiagonals grid (append nGrid (list (car grid))) diagonals))
+         ((null? grid)
+          (get-Diagonals-aux grid (delete-first-of-lists nGrid '()) (append diagonals (list (get-first-of-lists nGrid '())))))
+         (else
+          (get-Diagonals-aux (cdr grid) (delete-first-of-lists nGrid '()) (append diagonals (list (get-first-of-lists nGrid '())))))))
+
+(define (get-Diagonals-aux grid nGrid diagonals)
+   (cond ((null? grid)
+          (getDiagonals grid nGrid diagonals))
+         (else
+          (getDiagonals grid (append nGrid (list (car grid))) diagonals))))
+
+; Takes a list of lists and returns a list made of the fisrt elemento from each sub list
+(define (get-first-of-lists lists nLists)
+   (cond ((null? lists)
+          nLists)
+         (else
+          (get-first-of-lists (cdr lists) (append nLists (list (caar lists)))))))
+
+; Takes a list of lists and deletes all the first elements each sub list
+(define (delete-first-of-lists lists nLists)
+   (cond ((null? lists)
+          nLists)
+         ((equal? 1 (length  (car lists)))
+          (delete-first-of-lists (cdr lists) nLists))
+         (else
+          (delete-first-of-lists (cdr lists)(append nLists (list (cdar lists)))))))
 
 
 
-
-
-(analizeDiagonals '((o o o o)(x x x x)(o o o o)))
 
 ; TESTS
+
 #|
-(winner? '((x o o)
-           (o x o)
-           (x o x)))
+(winner? '((o o x)
+           (o _ o)
+           (x o o)))
 
 (winner? '((o x o o)
            (x o x x)
@@ -123,7 +147,27 @@
            (x x o)))
 
 (winner? '((o x o o)
-           (o x o x)
-           (o o x x)
+           (x _ o x)
+           (o _ x x)
            (x x o o)))
+
+(winner? '((x o o)
+           (o x x)
+           (x o o)))
+
+(winner? '((o x o o)
+           (x o x x)
+           (o x o o)))
+
+(winner? '((o x o o x)
+           (o o _ x x)
+           (x x x _ x)
+           (x _ o x x)))
+
+(winner? '((o x o o)
+           (x x o x)
+           (o o x x)
+           (_ x o o)
+           (x _ o o)
+           (o x o o)))
 |#
