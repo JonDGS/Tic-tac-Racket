@@ -104,7 +104,7 @@
 
 ;;Places in the next antidiagonal possible
 (define (place-next-antidiagonal grid numColumns startingPoint symbol otherSymbol)
-  (place-next-antidiagonal-aux grid numColumns (car startingPoint) 0 symbol otherSymbol '()))
+  (place-next-antidiagonal-aux grid numColumns (car startingPoint) (cadr startingPoint) symbol otherSymbol '()))
 
 ;;Gets the starting point for a diagonal
 (define (get-diagonal-starting-point start)
@@ -247,5 +247,10 @@
 ;;(get-computer-next-move (list (list '_ 'o 'x '_) (list 'x 'x 'o '_) (list '_ '_ '_ '_) (list '_ '_ '_ '_)) 4 4)
 ;;((x o x o o) (o x o _ x) (x o x x x) (_ _ x o x) (o o x _ o))
 ;;(get-computer-next-move (list (list 'x 'o 'x 'o 'o) (list 'o 'x 'o '_ 'x) (list 'x 'o 'x 'x 'x) (list '_ '_ 'x 'o 'x) (list 'o 'o 'x '_ 'o)) 5 5)
+;;((_ _ _) (o x _) (x _ o))
+;;(get-computer-next-move (list (list '_ '_ '_) (list 'o 'x '_) (list 'x '_ 'o)) 3 3)
+;;(get-computer-next-move (list (list '_ '_ '_) (list 'o 'x '_) (list 'o '_ 'x)) 3 3)
+;;((o _ _ _) (_ o x _) (_ _ _ x) (_ _ _ _))
+;;(get-computer-next-move (list (list 'o '_ '_ '_) (list '_ 'o 'x '_) (list '_ '_ '_ 'x) (list '_ '_ '_ '_)) 4 4)
 
 (provide (all-defined-out))
