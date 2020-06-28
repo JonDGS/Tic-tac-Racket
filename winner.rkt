@@ -27,7 +27,8 @@
    (cond ((null? list)
           #t)
          ((equal? element (car list))
-          (same-element? (cdr list) element))
+          (same-element? (cdr list)
+                         element))
          (else
           #f)))
 
@@ -46,14 +47,16 @@
    (cond ((null? grid)
           #t)
          ((equal? element (caar grid))
-          (winner?-v-aux1 (cdr grid) element))
+          (winner?-v-aux1 (cdr grid)
+                          element))
          (else
           #f)))
 
 ; This takes a grid and creates a new grid without the first column of each row
 (define (winner?-v-aux2 grid nGrid)
    (cond ((not (null? grid))
-          (winner?-v-aux2 (cdr grid) (cons (cdar grid) nGrid)))
+          (winner?-v-aux2 (cdr grid)
+                          (cons (cdar grid) nGrid)))
          (else
           nGrid)))
 
@@ -66,66 +69,81 @@
           #f)))
 
 (define (winner?-d-aux1 grid)
-   (cond ((analizeDiagonals (getDiagonals grid '() '()))
+   (cond ((analize-diagonals (get-diagonals grid '() '()))
           #t)
          (else
           #f)))          
 
 ; Checks if a giveng list of lists contains a sub list with both a length greater, or equal, than three and all its elements the same
-(define (analizeDiagonals lists)
+(define (analize-diagonals lists)
    (cond ((null? lists)
           #f)
          ((and (<= 3 (length (car lists)))(or (same-element? (car lists) 'x)(same-element? (car lists) 'o)))
           #t)
          (else
-          (analizeDiagonals (cdr lists)))))
+          (analize-diagonals (cdr lists)))))
 
 ; This function takes a grid and inverts its x axis, this is used to inspect the antidiagonals
 (define (change-grid grid nGrid)
    (cond ((null? grid)
           nGrid)
          (else
-          (change-grid (cdr grid)(append nGrid (list (reverse-list (car grid) '())))))))
+          (change-grid (cdr grid)
+                       (append nGrid (list (reverse-list (car grid) '())))))))
 
 ; Takes a list and inverts the order of its elements
 (define (reverse-list oList rList)
    (cond ((null? oList)
           rList)
          (else
-          (reverse-list (cdr oList)(cons (car oList) rList)))))
+          (reverse-list (cdr oList)
+                        (cons (car oList) rList)))))
 
 ; Takes a grid and gives us a list of diagonal lists of the grid
-(define (getDiagonals grid nGrid diagonals)
+(define (get-diagonals grid nGrid diagonals)
    (cond ((and (null? grid)(null? nGrid))
           diagonals)
          ((null? nGrid)
-          (getDiagonals grid (append nGrid (list (car grid))) diagonals))
+          (get-diagonals grid
+                         (append nGrid (list (car grid)))
+                         diagonals))
          ((null? grid)
-          (get-Diagonals-aux grid (delete-first-of-lists nGrid '()) (append diagonals (list (get-first-of-lists nGrid '())))))
+          (get-Diagonals-aux grid
+                             (delete-first-of-lists nGrid '())
+                             (append diagonals (list (get-first-of-lists nGrid '())))))
          (else
-          (get-Diagonals-aux (cdr grid) (delete-first-of-lists nGrid '()) (append diagonals (list (get-first-of-lists nGrid '())))))))
+          (get-Diagonals-aux (cdr grid)
+                             (delete-first-of-lists nGrid '())
+                             (append diagonals (list (get-first-of-lists nGrid '())))))))
 
 (define (get-Diagonals-aux grid nGrid diagonals)
    (cond ((null? grid)
-          (getDiagonals grid nGrid diagonals))
+          (get-diagonals grid
+                         nGrid
+                         diagonals))
          (else
-          (getDiagonals grid (append nGrid (list (car grid))) diagonals))))
+          (get-diagonals grid
+                         (append nGrid (list (car grid)))
+                         diagonals))))
 
-; Takes a list of lists and returns a list made of the fisrt elemento from each sub list
+; Takes a list of lists and returns a list made of the fisrt element from each sub list
 (define (get-first-of-lists lists nLists)
    (cond ((null? lists)
           nLists)
          (else
-          (get-first-of-lists (cdr lists) (append nLists (list (caar lists)))))))
+          (get-first-of-lists (cdr lists)
+                              (append nLists (list (caar lists)))))))
 
 ; Takes a list of lists and deletes all the first elements each sub list
 (define (delete-first-of-lists lists nLists)
    (cond ((null? lists)
           nLists)
          ((equal? 1 (length  (car lists)))
-          (delete-first-of-lists (cdr lists) nLists))
+          (delete-first-of-lists (cdr lists)
+                                 nLists))
          (else
-          (delete-first-of-lists (cdr lists)(append nLists (list (cdar lists)))))))
+          (delete-first-of-lists (cdr lists)
+                                 (append nLists (list (cdar lists)))))))
 
 
 
