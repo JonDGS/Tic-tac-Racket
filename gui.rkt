@@ -1,10 +1,8 @@
 #lang racket/gui
 
 (require "logic-utilities.rkt")
-(require "draw.rkt")
-(require "winner.rkt")
+(require "game-status.rkt")
 (require "try-to-win.rkt")
-(require "empty.rkt")
 
 ;; Global Variables
 (define global-rows 3)
