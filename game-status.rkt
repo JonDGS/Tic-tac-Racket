@@ -108,6 +108,7 @@
 
 ; HORIZONTAL check - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+; Checks if there are any winning horizontal lines
 (define (winner?-h grid)
    (cond ((null? grid)
           #f)
@@ -128,6 +129,7 @@
 
 ; VERTICAL check - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+; Checks if there are winning vertical lines
 (define (winner?-v grid)
    (cond ((or (null? grid) (null? (car grid)))
           #f)
@@ -156,12 +158,14 @@
 
 ; DIAGONAL check - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+; Checks if there is a diagonal line
 (define (winner?-d grid)
    (cond ((or (winner?-d-aux1 grid)(winner?-d-aux1 (change-grid grid '())))
           #t)
          (else
           #f)))
 
+; Calls all the diagonlas in the grid to be analized
 (define (winner?-d-aux1 grid)
    (cond ((analize-diagonals (get-diagonals grid '() '()))
           #t)
@@ -210,6 +214,7 @@
                              (delete-first-of-lists nGrid '())
                              (append diagonals (list (get-first-of-lists nGrid '())))))))
 
+; Used to modify a parameter of the get-Diagonal function
 (define (get-Diagonals-aux grid nGrid diagonals)
    (cond ((null? grid)
           (get-diagonals grid
