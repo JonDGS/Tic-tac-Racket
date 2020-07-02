@@ -184,9 +184,11 @@
                      (send game-frame show #t)
                      (send input-frame show #f) )]))
 
-; Center both frames as default
-(send game-frame center 'both)
-(send input-frame center 'both)
+;; Starts the game by showing the window to input the grid dimensions
+(define (TicTacToe)
+  ; Center both frames as default
+  (send game-frame center 'both)
+  (send input-frame center 'both)
+  (send input-frame show #t))
 
-;(send input-frame show #t)
-(send game-frame show #t)
+(TicTacToe)
